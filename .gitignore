@@ -1,0 +1,10 @@
+# Project
+/dev.sqlite3
+.env
+
+# Rust
+/target
+
+# IntelliJ
+/*.iml
+/.idea
