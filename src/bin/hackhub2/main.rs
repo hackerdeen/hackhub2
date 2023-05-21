@@ -1,3 +1,4 @@
+
 use std::env;
 
 use actix_web::{App, HttpServer, web};
@@ -5,9 +6,7 @@ use diesel::SqliteConnection;
 use diesel::r2d2::ConnectionManager;
 use dotenvy::dotenv;
 
-mod db;
-mod website;
-mod user;
+mod api;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -21,8 +20,8 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || App::new()
         .app_data(web::Data::new(pool.clone()))
-        .service(website::index)
-        .service(website::hello))
+        .service(api::user::index)
+        .service(api::irc::nicks))
         .bind(("127.0.0.1", 8080))?
         .run()
         .await

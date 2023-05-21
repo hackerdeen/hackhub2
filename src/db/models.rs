@@ -1,15 +1,9 @@
 use chrono::{NaiveDate, NaiveDateTime};
-use diesel::prelude::Queryable;
+use diesel::prelude::{Insertable,Queryable};
 use serde::Serialize;
 
-#[derive(Debug, Serialize)]
-pub enum RegisterUpdateStatus {
-    MemberSubmitted,
-    RecordedByRegistrar,
-    RejectedByRegistrar,
-}
-
 #[derive(Debug, Serialize, Queryable)]
+#[diesel(table_name = crate::db::schema::address)]
 pub struct Address {
     id: Option<i32>,
     user: i32,
@@ -26,7 +20,7 @@ pub struct Membership {
     id: Option<i32>,
     user: Option<i32>,
     registered: NaiveDateTime,
-    ceased: NaiveDate,
+    pub(crate) ceased: NaiveDate,
     cessation_registered: NaiveDateTime,
 }
 
@@ -37,7 +31,6 @@ pub struct PersonData {
     legal_name: i32,
     service_address: i32,
     residential_address: Option<i32>,
-    state: RegisterUpdateStatus,
     submitted_time: NaiveDateTime,
     registrar_action_time: NaiveDateTime,
     registrar: Option<i32>,
@@ -62,7 +55,23 @@ pub struct PersonName {
 }
 
 
+#[derive(Clone, Debug, Insertable)]
+#[diesel(table_name = crate::db::schema::user)]
+pub struct NewUser<'a> {
+    /// Used to identify the user account.
+    pub username: &'a str,
+    /// Used for all purposes other than those relating to authentication, and those requiring the
+    /// use of a "legal name".
+    pub preferred_name: &'a str,
+    /// Used for legal notices, and other communications if opted-in.
+    pub email: &'a str,
+    pub irc: Option<&'a str>,
+    pub github: Option<&'a str>,
+}
+
+
 #[derive(Clone, Debug, Serialize, Queryable)]
+#[diesel(table_name = crate::db::schema::user)]
 pub struct User {
     pub id: Option<i32>,
     /// Used to identify the user account.
